@@ -11,7 +11,9 @@ class MovieReviewSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final movieReviewsAsync = ref.watch(movieReviewsProvider(movieId));
+    return Container();
+
+    /*final movieReviewsAsync = ref.watch(movieReviewsProvider(movieId));
 
     return movieReviewsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -52,6 +54,6 @@ class MovieReviewSection extends ConsumerWidget {
           ),
         );
       },
-    );
+    );*/
   }
 }

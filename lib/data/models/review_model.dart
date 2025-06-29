@@ -1,31 +1,22 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import 'package:trelpix/data/models/author_details_model.dart';
-import 'package:trelpix/domain/entities/review.dart';
 
 part 'review_model.g.dart';
 
-@HiveType(typeId: 5) // Unique typeId for ReviewModel
-@JsonSerializable(fieldRename: FieldRename.snake)
-class ReviewModel extends Review {
+@HiveType(typeId: 5)
+class ReviewModel extends Equatable {
   @HiveField(0)
   final String id;
-
   @HiveField(1)
   final String author;
-
   @HiveField(2)
   final String content;
-
   @HiveField(3)
   final String? url;
-
   @HiveField(4)
-  @JsonKey(name: 'author_details')
   final AuthorDetailsModel? authorDetails;
-
   @HiveField(5)
-  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
   const ReviewModel({
@@ -35,31 +26,45 @@ class ReviewModel extends Review {
     this.url,
     this.authorDetails,
     this.updatedAt,
-  }) : super(
-         id: id,
-         author: author,
-         content: content,
-         url: url,
-         authorDetails: authorDetails,
-         updatedAt: updatedAt,
-       );
+  });
 
-  factory ReviewModel.fromJson(Map<String, dynamic> json) =>
-      _$ReviewModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ReviewModelToJson(this);
-
-  factory ReviewModel.fromEntity(Review review) {
+  factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
-      id: review.id,
-      author: review.author,
-      content: review.content,
-      url: review.url,
+      id: json['id'] as String,
+      author: json['author'] as String,
+      content: json['content'] as String,
+      url: json['url'] as String?,
       authorDetails:
-          review.authorDetails != null
-              ? AuthorDetailsModel.fromEntity(review.authorDetails!)
+          json['author_details'] != null
+              ? AuthorDetailsModel.fromJson(
+                json['author_details'] as Map<String, dynamic>,
+              )
               : null,
-      updatedAt: review.updatedAt,
+      updatedAt:
+          json['updated_at'] != null
+              ? DateTime.parse(json['updated_at'] as String)
+              : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'author': author,
+      'content': content,
+      'url': url,
+      'author_details': authorDetails?.toJson(),
+      'updated_at': updatedAt?.toIso8601String(),
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    author,
+    content,
+    url,
+    authorDetails,
+    updatedAt,
+  ];
 }

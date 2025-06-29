@@ -1,23 +1,19 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:hive/hive.dart';
-import 'package:trelpix/domain/entities/author_details.dart';
 
 part 'author_details_model.g.dart';
 
 @HiveType(typeId: 7) // Unique typeId for AuthorDetailsModel
 @JsonSerializable(fieldRename: FieldRename.snake)
-class AuthorDetailsModel extends AuthorDetails {
+class AuthorDetailsModel extends Equatable {
   @HiveField(0)
   final String? name;
-
   @HiveField(1)
   final String? username;
-
   @HiveField(2)
   final String? avatarPath;
-
   @HiveField(3)
-  @JsonKey(fromJson: _parseRating, toJson: _toJsonRating)
   final double? rating;
 
   const AuthorDetailsModel({
@@ -25,35 +21,29 @@ class AuthorDetailsModel extends AuthorDetails {
     this.username,
     this.avatarPath,
     this.rating,
-  }) : super(
-         name: name,
-         username: username,
-         avatarPath: avatarPath,
-         rating: rating,
-       );
+  });
 
-  factory AuthorDetailsModel.fromJson(Map<String, dynamic> json) =>
-      _$AuthorDetailsModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$AuthorDetailsModelToJson(this);
-
-  factory AuthorDetailsModel.fromEntity(AuthorDetails authorDetails) {
+  factory AuthorDetailsModel.fromJson(Map<String, dynamic> json) {
     return AuthorDetailsModel(
-      name: authorDetails.name,
-      username: authorDetails.username,
-      avatarPath: authorDetails.avatarPath,
-      rating: authorDetails.rating,
+      name: json['name'] as String?,
+      username: json['username'] as String?,
+      avatarPath: json['avatar_path'] as String?,
+      rating:
+          json['rating'] != null
+              ? double.tryParse(json['rating'].toString())
+              : null,
     );
   }
 
-  // 👇 Custom parser for rating
-  static double? _parseRating(dynamic value) {
-    if (value == null) return null;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'username': username,
+      'avatar_path': avatarPath,
+      'rating': rating,
+    };
   }
 
-  static dynamic _toJsonRating(double? value) => value;
+  @override
+  List<Object?> get props => [name, username, avatarPath, rating];
 }

@@ -20,6 +20,33 @@ class MovieDetails extends Movie {
     this.casts = const [], // Default to empty list
     this.reviews = const [], // Default to empty list
   });
+  MovieDetails copyWith({
+    int? id,
+    String? title,
+    String? overview,
+    String? posterPath,
+    String? backdropPath,
+    double? voteAverage,
+    int? voteCount,
+    String? releaseDate,
+    int? runtime,
+    List<Genre>? genres,
+    List<Cast>? casts,
+    List<Review>? reviews,
+  }) {
+    return MovieDetails(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      overview: overview ?? this.overview,
+      posterPath: posterPath ?? this.posterPath,
+      backdropPath: backdropPath ?? this.backdropPath,
+      voteAverage: voteAverage ?? this.voteAverage,
+      releaseDate: releaseDate ?? this.releaseDate,
+      genres: genres ?? this.genres,
+      casts: casts ?? this.casts,
+      reviews: reviews ?? this.reviews,
+    );
+  }
 
   @override
   List<Object?> get props => [

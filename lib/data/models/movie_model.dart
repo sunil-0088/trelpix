@@ -1,32 +1,24 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
-import 'package:trelpix/domain/entities/movie.dart'; // Import Hive
+import 'package:json_annotation/json_annotation.dart';
 
 part 'movie_model.g.dart';
 
-// TypeId must be unique for each HiveType within your app
 @HiveType(typeId: 0)
-// Maps JSON keys to Dart field names.
-@JsonSerializable(fieldRename: FieldRename.snake)
-class MovieModel extends Movie {
+class MovieModel extends Equatable {
   @HiveField(0)
   final int id;
   @HiveField(1)
   final String title;
   @HiveField(2)
-  @JsonKey(name: 'poster_path')
   final String? posterPath;
   @HiveField(3)
-  @JsonKey(name: 'backdrop_path')
   final String? backdropPath;
   @HiveField(4)
-  @JsonKey(name: 'release_date')
   final String? releaseDate;
   @HiveField(5)
-  @JsonKey(name: 'vote_average')
   final double? voteAverage;
   @HiveField(6)
-  @JsonKey(name: 'overview')
   final String? overview;
 
   const MovieModel({
@@ -37,36 +29,42 @@ class MovieModel extends Movie {
     this.releaseDate,
     this.voteAverage,
     this.overview,
-  }) : super(
-         id: id,
-         title: title,
-         posterPath: posterPath,
-         backdropPath: backdropPath,
-         releaseDate: releaseDate,
-         voteAverage: voteAverage,
-         overview: overview,
-       );
+  });
 
-  factory MovieModel.fromJson(Map<String, dynamic> json) =>
-      _$MovieModelFromJson(json);
-
-  @override // Override to use the class's own toJson method
-  Map<String, dynamic> toJson() => _$MovieModelToJson(this);
-
-  // Helper to convert Movie entity back to MovieModel if needed for saving
-  factory MovieModel.fromEntity(Movie movie) {
+  factory MovieModel.fromJson(Map<String, dynamic> json) {
     return MovieModel(
-      id: movie.id,
-      title: movie.title,
-      posterPath: movie.posterPath,
-      backdropPath: movie.backdropPath,
-      releaseDate: movie.releaseDate,
-      voteAverage: movie.voteAverage,
-      overview: movie.overview,
+      id: json['id'] as int,
+      title: json['title'] as String,
+      posterPath: json['poster_path'] as String?,
+      backdropPath: json['backdrop_path'] as String?,
+      releaseDate: json['release_date'] as String?,
+      voteAverage: (json['vote_average'] as num?)?.toDouble(),
+      overview: json['overview'] as String?,
     );
   }
 
-  // Equatable properties are still inherited from Movie
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'poster_path': posterPath,
+      'backdrop_path': backdropPath,
+      'release_date': releaseDate,
+      'vote_average': voteAverage,
+      'overview': overview,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    title,
+    posterPath,
+    backdropPath,
+    releaseDate,
+    voteAverage,
+    overview,
+  ];
 }
 
 @JsonSerializable()
