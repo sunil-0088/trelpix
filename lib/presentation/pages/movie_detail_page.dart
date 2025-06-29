@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/widgets/bookmark_button.dart';
@@ -20,7 +23,12 @@ class MovieDetailPage extends ConsumerWidget {
 
     return Scaffold(
       body: movieDetailsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () {
+          if (Platform.isIOS) {
+            return const Center(child: CupertinoActivityIndicator());
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
         error:
             (err, stack) => Center(
               child: Padding(

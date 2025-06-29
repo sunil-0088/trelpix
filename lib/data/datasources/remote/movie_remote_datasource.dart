@@ -32,7 +32,7 @@ class MovieRemoteDataSource {
 
   // Corrected: Should return Future<List<MovieModel>> for search results
   Future<List<MovieModel>> searchMovies(String query, {int page = 1}) async {
-    final responseMap = await apiClient.searchMovies(query, apiKey, page);
+    final responseMap = await apiClient.searchMovies(apiKey, query, page);
     return responseMap.results;
   }
 

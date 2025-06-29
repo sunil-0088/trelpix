@@ -27,7 +27,9 @@ class ImageCacheService {
 
   Future<File?> downloadAndCacheImage(String imageUrl) async {
     if (imageUrl.isEmpty) return null;
-
+    if (kDebugMode) {
+      print('ImageCacheService: Downloading image from $imageUrl');
+    }
     final cacheDirPath = await _getCacheDirectoryPath();
     final filePath = _getLocalFilePath(cacheDirPath, imageUrl);
     final file = File(filePath);
@@ -53,7 +55,9 @@ class ImageCacheService {
     final cacheDirPath = await _getCacheDirectoryPath();
     final filePath = _getLocalFilePath(cacheDirPath, imageUrl);
     final file = File(filePath);
-
+    if (kDebugMode) {
+      print('ImageCacheService: Checking cache for image: $imageUrl');
+    }
     if (await file.exists()) {
       return file;
     } else {

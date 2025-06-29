@@ -16,7 +16,7 @@ class MovieCard extends StatelessWidget {
             Stack(
               children: [
                 Container(
-                  height: 200,
+                  height: 170,
                   width: 150,
                   foregroundDecoration: BoxDecoration(
                     gradient: LinearGradient(

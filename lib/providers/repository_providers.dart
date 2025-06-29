@@ -1,4 +1,6 @@
 // lib/providers/repository_providers.dart
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Data layer imports
@@ -29,7 +31,11 @@ final movieRepositoryProvider = Provider<IMovieRepository>((ref) {
           remote: remoteDataSource,
           local: localDataSource,
         ),
-    loading: () => throw Exception('MovieLocalDataSource not ready'),
+    loading:
+        () =>
+            throw DeferredLoadException(
+              'Local data source is still loading. Please wait...',
+            ),
     error:
         (err, st) => throw Exception('Failed to load local data source: $err'),
   );

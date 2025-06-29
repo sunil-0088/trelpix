@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:trelpix/presentation/pages/home_page.dart';
 import 'package:trelpix/presentation/pages/saved_movies_page.dart';
+import 'package:trelpix/presentation/pages/search_page.dart';
 import 'package:trelpix/providers/navigation_provider.dart';
 
 class MainPage extends ConsumerWidget {
@@ -30,17 +30,28 @@ class MainPage extends ConsumerWidget {
         },
 
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Saved'),
+          BottomNavigationBarItem(
+            activeIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            activeIcon: Icon(Icons.bookmark),
+            icon: Icon(Icons.bookmark_outline_rounded),
+            label: 'Saved',
+          ),
         ],
       ),
-
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Hive.close(); // Close all open boxes before deleting
-          await Hive.deleteFromDisk(); // Delete all Hive data from disk
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SearchPage()),
+          );
         },
-        child: const Icon(Icons.delete_forever, color: Colors.white),
+
+        child: const Icon(Icons.search),
       ),
     );
   }

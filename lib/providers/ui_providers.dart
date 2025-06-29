@@ -117,8 +117,8 @@ final isBookmarkedProvider = FutureProvider.family<bool, int>((
   ref,
   movieId,
 ) async {
+  // It should query the use case directly, not watch the full list provider.
   final isMovieBookmarkedUseCase = ref.watch(isMovieBookmarkedUseCaseProvider);
-  ref.watch(bookmarkedMoviesProvider); // To react to bookmark changes
   return await isMovieBookmarkedUseCase(movieId);
 });
 
@@ -136,7 +136,7 @@ final bookmarkedMoviesProvider =
         addBookmark,
         removeBookmark,
         preloadImage,
-        ref,
+        ref, // Keep ref to invalidate other providers
       );
     });
 
@@ -145,7 +145,7 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
   final AddBookmark _addBookmark;
   final RemoveBookmark _removeBookmark;
   final PreloadImage _preloadImage;
-  final Ref _ref;
+  final Ref _ref; // To invalidate other providers
 
   BookmarkedMoviesNotifier(
     this._getBookmarkedMovies,
@@ -154,7 +154,7 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
     this._preloadImage,
     this._ref,
   ) : super(const AsyncValue.loading()) {
-    _loadBookmarks();
+    _loadBookmarks(); // Initial load
   }
 
   Future<void> _loadBookmarks() async {
@@ -173,16 +173,51 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
   }
 
   Future<void> addBookmark(Movie movie) async {
-    await _addBookmark(movie);
-    _ref.invalidate(isBookmarkedProvider(movie.id));
-    await _loadBookmarks();
+    // Optimistic UI update (optional, but good for responsiveness)
+    if (state.hasValue) {
+      final currentList = state.value!;
+      if (!currentList.any((m) => m.id == movie.id)) {
+        state = AsyncValue.data([...currentList, movie]);
+      }
+    } else {
+      // If state is not ready, go to loading and reload
+      state = const AsyncValue.loading();
+    }
+
+    try {
+      await _addBookmark(movie); // Execute the use case
+      _ref.invalidate(
+        isBookmarkedProvider(movie.id),
+      ); // Invalidate the single movie status
+      await _loadBookmarks(); // Ensure the full list is accurate
+    } catch (e, st) {
+      // Revert optimistic update or show error
+      state = AsyncValue.error(e, st); // Handle error
+      await _loadBookmarks(); // Attempt to reload to reflect actual state
+    }
   }
 
   Future<void> removeBookmark(int movieId) async {
-    await _removeBookmark(movieId);
-    _ref.invalidate(
-      isBookmarkedProvider(movieId),
-    ); // Invalidate to refresh UI for this movie
-    await _loadBookmarks(); // Reload all bookmarks
+    // Optimistic UI update (optional)
+    if (state.hasValue) {
+      final currentList = state.value!;
+      state = AsyncValue.data(
+        currentList.where((m) => m.id != movieId).toList(),
+      );
+    } else {
+      state = const AsyncValue.loading();
+    }
+
+    try {
+      await _removeBookmark(movieId); // Execute the use case
+      _ref.invalidate(
+        isBookmarkedProvider(movieId),
+      ); // Invalidate the single movie status
+      await _loadBookmarks(); // Ensure the full list is accurate
+    } catch (e, st) {
+      // Revert optimistic update or show error
+      state = AsyncValue.error(e, st); // Handle error
+      await _loadBookmarks(); // Attempt to reload to reflect actual state
+    }
   }
 }

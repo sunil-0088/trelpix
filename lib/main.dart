@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -10,6 +11,7 @@ import 'package:trelpix/data/models/movie_model.dart';
 import 'package:trelpix/data/models/review_model.dart';
 import 'package:trelpix/data/models/reviews_response_model.dart';
 import 'package:trelpix/presentation/pages/main_page.dart';
+import 'package:device_preview/device_preview.dart';
 
 const String tmdbApiKey = '050941db6fd813e38d32e88db00f4bdd';
 
@@ -27,7 +29,14 @@ Future<void> main() async {
   Hive.registerAdapter(CreditsResponseModelAdapter());
   Hive.registerAdapter(ReviewsResponseModelAdapter());
 
-  runApp(const ProviderScope(child: MovieApp()));
+  runApp(
+    ProviderScope(
+      child: DevicePreview(
+        enabled: !kReleaseMode,
+        builder: (context) => MovieApp(), // Wrap your app
+      ),
+    ),
+  );
 }
 
 class MovieApp extends StatefulWidget {
@@ -43,6 +52,8 @@ class _MovieAppState extends State<MovieApp> {
     return MaterialApp(
       title: 'Movie DB App',
       debugShowCheckedModeBanner: false,
+      builder: DevicePreview.appBuilder, // Integrates with device_preview
+      locale: DevicePreview.locale(context), // <== Important!
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
