@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trelpix/domain/entities/cast.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 
 class CastCard extends StatelessWidget {
   const CastCard({super.key, required this.cast});
@@ -14,17 +15,19 @@ class CastCard extends StatelessWidget {
           Container(
             height: 100,
             width: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image:
-                    cast.fullProfileUrl != null
-                        ? NetworkImage(cast.fullProfileUrl!)
-                        : AssetImage('assets/images/placeholder.png')
-                            as ImageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+            child:
+                cast.fullProfileUrl == null || cast.fullProfileUrl!.isEmpty
+                    ? const Center(
+                      child: Icon(Icons.person, size: 50, color: Colors.grey),
+                    )
+                    : ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      child: CachedImageView(imageUrl: cast.fullProfileUrl!),
+                    ),
           ),
           const SizedBox(height: 8),
           SizedBox(

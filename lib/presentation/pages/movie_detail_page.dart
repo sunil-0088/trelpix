@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/widgets/bookmark_button.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 import 'package:trelpix/presentation/widgets/movie_cast_section.dart';
 import 'package:trelpix/presentation/widgets/movie_info_section.dart';
 import 'package:trelpix/presentation/widgets/movie_review_section.dart';
@@ -67,12 +68,21 @@ class MovieDetailPage extends ConsumerWidget {
                           end: Alignment.topCenter,
                         ),
                       ),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage((movieDetails).fullBackdropUrl!),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+
+                      child:
+                          movieDetails.fullBackdropUrl == null ||
+                                  movieDetails.fullBackdropUrl!.isEmpty
+                              ? const Center(
+                                child: Icon(
+                                  Icons.movie,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                              )
+                              : CachedImageView(
+                                imageUrl: movieDetails.fullBackdropUrl!,
+                                fit: BoxFit.cover,
+                              ),
                     ),
 
                     MovieInfoSection(movieDetails: movieDetails),
@@ -100,8 +110,7 @@ class MovieDetailPage extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(8),
-                          backgroundColor:
-                              Colors.white30, // Button background color
+                          backgroundColor: Colors.white30,
                         ),
                         child: const Icon(
                           Icons.arrow_back,

@@ -28,7 +28,7 @@ class ReviewCard extends StatelessWidget {
                       backgroundImage: NetworkImage(
                         review.authorDetails?.fullAvatarUrl ??
                             'https://avatar.iran.liara.run/public',
-                      ), // Placeholder image
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Column(

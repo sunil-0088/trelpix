@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 import 'package:trelpix/presentation/widgets/shimmer/shimmer_carousel_placeholder.dart';
 import 'package:trelpix/providers/navigation_provider.dart';
 import 'package:trelpix/providers/ui_providers.dart';
@@ -67,17 +68,22 @@ class TopRatedCarousel extends ConsumerWidget {
                     end: Alignment.topCenter,
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(0),
-
-                  child: Image.network(
-                    'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                    fit: BoxFit.fill,
-                    errorBuilder:
-                        (context, error, stackTrace) =>
-                            const Center(child: Icon(Icons.broken_image)),
-                  ),
-                ),
+                child:
+                    movie.fullPosterUrl == null || movie.fullPosterUrl!.isEmpty
+                        ? const Center(
+                          child: Icon(
+                            Icons.movie,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        )
+                        : CachedImageView(
+                          imageUrl: movie.fullPosterUrl ?? '',
+                          fit: BoxFit.fill,
+                          placeholder: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
               ),
               Positioned(
                 bottom: 16,

@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:logger/logger.dart';
 import 'package:trelpix/data/datasources/local/movie_local_datasource.dart';
 import 'package:trelpix/data/datasources/remote/movie_remote_datasource.dart';
 import 'package:trelpix/data/mappers/movie_mapper.dart';
 import 'package:trelpix/data/models/movie_model.dart';
+import 'package:trelpix/data/services/image_cache_service.dart';
 import 'package:trelpix/domain/entities/cast.dart';
 import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/domain/entities/movie_details.dart';
@@ -12,24 +16,28 @@ import 'package:trelpix/domain/repositories/movie_repository.dart';
 class MovieRepositoryImpl implements IMovieRepository {
   final MovieLocalDataSource local;
   final MovieRemoteDataSource remote;
-
-  MovieRepositoryImpl({required this.local, required this.remote});
+  final ImageCacheService imageCacheService;
+  final Logger _logger = Logger();
+  MovieRepositoryImpl({
+    required this.local,
+    required this.remote,
+    required this.imageCacheService,
+  });
 
   @override
   Future<List<Movie>> getMovies(MovieCategory category) async {
     try {
       final isStale = await local.isCacheStale(category);
-      if (!isStale) {
-        final localMovies = await local.getMovies(
-          category,
-        ); // This returns List<MovieModel>
-        if (localMovies.isNotEmpty) {
-          print('Serving ${category.name} movies from local cache.');
-          return localMovies.map((model) => model.toEntity()).toList();
-        }
-      }
+      // if (!isStale) {
+      //   final localMovies = await local.getMovies(category);
+      //   if (localMovies.isNotEmpty) {
+      //     _logger.d('Serving ${category.name} movies from local cache.');
 
-      print('Fetching ${category.name} movies from remote.');
+      //     return localMovies.map((model) => model.toEntity()).toList();
+      //   }
+      // }
+
+      _logger.d('Fetching ${category.name} movies from remote.');
       // MovieRemoteDataSource now directly returns List<MovieModel> by parsing MoviesResponseModel
       List<MovieModel> remoteMovies;
       switch (category) {
@@ -43,14 +51,28 @@ class MovieRepositoryImpl implements IMovieRepository {
           remoteMovies = await remote.getTopRatedMovies();
           break;
       }
+      Future.microtask(() {
+        for (final movie in remoteMovies) {
+          () async {
+            _logger.d('Preloading image and movie Details: ${movie.title}');
+            final details = await getMovieDetails(movie.id);
+            if (details.fullBackdropUrl != null) {
+              await imageCacheService.downloadAndCacheImage(
+                details.fullBackdropUrl!,
+              );
+            }
+          }();
+        }
+      });
 
-      await local.putMovies(category, remoteMovies); // Stores List<MovieModel>
+      await local.putMovies(category, remoteMovies);
+
       return remoteMovies.map((model) => model.toEntity()).toList();
     } catch (e) {
-      print('Error getting ${category.name} movies: $e');
+      _logger.d('Error getting ${category.name} movies: $e');
       final localMovies = await local.getMovies(category);
       if (localMovies.isNotEmpty) {
-        print(
+        _logger.d(
           'Serving ${category.name} movies from stale local cache due to error.',
         );
         return localMovies.map((model) => model.toEntity()).toList();
@@ -66,7 +88,7 @@ class MovieRepositoryImpl implements IMovieRepository {
       final remoteMovies = await remote.searchMovies(query, page: page);
       return remoteMovies.map((model) => model.toEntity()).toList();
     } catch (e) {
-      print('Error searching movies: $e');
+      _logger.d('Error searching movies: $e');
       rethrow;
     }
   }
@@ -83,14 +105,14 @@ class MovieRepositoryImpl implements IMovieRepository {
       if (localDetails != null &&
           localCredits != null &&
           localReviewsResponse != null) {
-        print('Serving full movie details for $movieId from local cache.');
+        _logger.d('Serving full movie details for $movieId from local cache.');
         return localDetails.toEntity(
           casts: localCredits.toCastList(),
           reviews: localReviewsResponse.toReviewList(), // Extract results here
         );
       }
 
-      print('Fetching full movie details for $movieId from remote.');
+      _logger.d('Fetching full movie details for $movieId from remote.');
       final remoteDetails = await remote.getMovieDetails(movieId);
       final remoteCredits = await remote.getMovieCredits(movieId);
       final remoteReviewsResponse = await remote.getMovieReviews(
@@ -109,7 +131,7 @@ class MovieRepositoryImpl implements IMovieRepository {
         reviews: remoteReviewsResponse.toReviewList(), // Extract results here
       );
     } catch (e) {
-      print('Error getting movie details for $movieId: $e');
+      _logger.d('Error getting movie details for $movieId: $e');
       final localDetails = await local.getMovieDetails(movieId);
       final localCredits = await local.getMovieCast(movieId);
       final localReviewsResponse = await local.getMovieReviews(movieId);
@@ -117,7 +139,7 @@ class MovieRepositoryImpl implements IMovieRepository {
       if (localDetails != null ||
           localCredits != null ||
           localReviewsResponse != null) {
-        print(
+        _logger.d(
           'Serving partial movie details from stale local cache due to error.',
         );
         return MovieDetails(

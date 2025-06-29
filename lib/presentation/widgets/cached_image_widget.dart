@@ -19,7 +19,7 @@ class CachedImageView extends ConsumerStatefulWidget {
   const CachedImageView({
     super.key,
     required this.imageUrl,
-    this.fit,
+    this.fit = BoxFit.cover,
     this.height,
     this.width,
     this.placeholder,

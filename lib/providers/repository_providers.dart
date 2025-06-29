@@ -23,6 +23,7 @@ import 'package:trelpix/providers/datasource_providers.dart';
 final movieRepositoryProvider = Provider<IMovieRepository>((ref) {
   final remoteDataSource = ref.watch(movieRemoteDataSourceProvider);
   final localDataSourceAsync = ref.watch(movieLocalDataSourceProvider);
+  final imageCacheService = ref.watch(imageCacheServiceProvider);
 
   // Still use .when for localDataSourceAsync as it's a FutureProvider
   return localDataSourceAsync.when(
@@ -30,6 +31,7 @@ final movieRepositoryProvider = Provider<IMovieRepository>((ref) {
         (localDataSource) => MovieRepositoryImpl(
           remote: remoteDataSource,
           local: localDataSource,
+          imageCacheService: imageCacheService,
         ),
     loading:
         () =>

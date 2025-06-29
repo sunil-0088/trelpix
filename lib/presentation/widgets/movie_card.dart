@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trelpix/domain/entities/movie.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 
 class MovieCard extends StatelessWidget {
   const MovieCard({super.key, required this.movie, required this.onTap});
@@ -31,15 +32,31 @@ class MovieCard extends StatelessWidget {
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                     ),
-                    image: DecorationImage(
-                      image:
-                          movie.fullPosterUrl != null
-                              ? NetworkImage(movie.fullPosterUrl!)
-                              : AssetImage('assets/images/placeholder.png')
-                                  as ImageProvider,
-                      fit: BoxFit.cover,
-                    ),
                   ),
+
+                  child:
+                      movie.fullPosterUrl == null ||
+                              movie.fullPosterUrl!.isEmpty
+                          ? const Center(
+                            child: Icon(
+                              Icons.movie,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          )
+                          : ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
+                            ),
+                            child: CachedImageView(
+                              imageUrl: movie.fullPosterUrl!,
+                              fit: BoxFit.cover,
+                              placeholder: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                          ),
                 ),
                 Positioned(
                   right: 1,
