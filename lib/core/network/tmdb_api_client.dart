@@ -33,13 +33,13 @@ abstract class TmdbApiClient {
     @Query("api_key") String apiKey,
   );
 
-  @GET("movie/{movie_id}/credits") // New API endpoint for credits
+  @GET("movie/{movie_id}/credits")
   Future<CreditsResponseModel> getMovieCredits(
     @Path("movie_id") int movieId,
     @Query("api_key") String apiKey,
   );
 
-  @GET("movie/{movie_id}/reviews") // New API endpoint for reviews
+  @GET("movie/{movie_id}/reviews")
   Future<ReviewsResponseModel> getMovieReviews(
     @Path("movie_id") int movieId,
     @Query("api_key") String apiKey,

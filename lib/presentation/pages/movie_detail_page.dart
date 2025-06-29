@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trelpix/domain/entities/movie_details.dart';
-import 'package:trelpix/presentation/providers/movie_providers.dart';
 import 'package:trelpix/presentation/widgets/bookmark_button.dart';
 import 'package:trelpix/presentation/widgets/movie_cast_section.dart';
 import 'package:trelpix/presentation/widgets/movie_info_section.dart';
 import 'package:trelpix/presentation/widgets/movie_review_section.dart';
+import 'package:trelpix/providers/ui_providers.dart';
 import 'package:trelpix/utils/colors.dart';
 
 class MovieDetailPage extends ConsumerWidget {
@@ -62,9 +61,7 @@ class MovieDetailPage extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(
-                            (movieDetails as MovieDetails).fullBackdropUrl!,
-                          ),
+                          image: NetworkImage((movieDetails).fullBackdropUrl!),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -72,9 +69,9 @@ class MovieDetailPage extends ConsumerWidget {
 
                     MovieInfoSection(movieDetails: movieDetails),
 
-                    MovieCastSection(movieId: movieId),
+                    MovieCastSection(movie: movieDetails),
 
-                    MovieReviewSection(movieId: movieId),
+                    MovieReviewSection(movie: movieDetails),
 
                     const SizedBox(height: 24),
                   ],

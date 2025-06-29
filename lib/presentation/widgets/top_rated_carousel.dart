@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
-import 'package:trelpix/presentation/providers/movie_providers.dart';
-import 'package:trelpix/presentation/providers/navigation_provider.dart';
+import 'package:trelpix/providers/navigation_provider.dart';
+import 'package:trelpix/providers/ui_providers.dart';
 
 class TopRatedCarousel extends ConsumerWidget {
   const TopRatedCarousel({super.key, required this.screenHeight});

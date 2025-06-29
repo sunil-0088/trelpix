@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
-import 'package:trelpix/presentation/providers/movie_providers.dart';
 import 'package:trelpix/presentation/widgets/movie_card.dart';
+import 'package:trelpix/providers/ui_providers.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});

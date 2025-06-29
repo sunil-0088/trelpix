@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:trelpix/presentation/pages/home_page.dart';
 import 'package:trelpix/presentation/pages/saved_movies_page.dart';
-import 'package:trelpix/presentation/providers/navigation_provider.dart';
+import 'package:trelpix/providers/navigation_provider.dart';
 
 class MainPage extends ConsumerWidget {
   const MainPage({super.key});

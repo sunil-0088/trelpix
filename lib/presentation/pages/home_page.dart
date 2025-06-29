@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
 import 'package:trelpix/presentation/pages/search_page.dart';
-import 'package:trelpix/presentation/providers/movie_providers.dart';
 import 'package:trelpix/presentation/widgets/movie_card.dart';
 import 'package:trelpix/presentation/widgets/section_title.dart';
 import 'package:trelpix/presentation/widgets/top_rated_carousel.dart';
+import 'package:trelpix/providers/ui_providers.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});

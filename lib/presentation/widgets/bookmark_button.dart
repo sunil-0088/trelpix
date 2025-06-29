@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/domain/entities/movie_details.dart';
-import 'package:trelpix/presentation/providers/movie_providers.dart';
+import 'package:trelpix/providers/ui_providers.dart';
 
 class BookmarkButton extends ConsumerWidget {
   const BookmarkButton({super.key, required this.movieDetails});
