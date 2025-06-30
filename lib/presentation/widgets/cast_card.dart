@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trelpix/domain/entities/cast.dart';
 import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
@@ -8,6 +11,8 @@ class CastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Platform.isIOS ? CupertinoIcons.person : Icons.person;
+
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: Column(
@@ -15,18 +20,21 @@ class CastCard extends StatelessWidget {
           Container(
             height: 100,
             width: 100,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.grey.shade900,
+            ),
             child:
                 cast.fullProfileUrl == null || cast.fullProfileUrl!.isEmpty
-                    ? const Center(
-                      child: Icon(Icons.person, size: 50, color: Colors.grey),
-                    )
+                    ? Center(child: Icon(icon, size: 50, color: Colors.grey))
                     : ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedImageView(
+                        imageUrl: cast.fullProfileUrl!,
+                        fit: BoxFit.cover,
+                        height: 100,
+                        width: 100,
                       ),
-                      child: CachedImageView(imageUrl: cast.fullProfileUrl!),
                     ),
           ),
           const SizedBox(height: 8),
@@ -37,7 +45,7 @@ class CastCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

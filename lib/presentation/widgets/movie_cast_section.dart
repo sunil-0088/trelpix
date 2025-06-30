@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/domain/entities/movie_details.dart';
@@ -16,22 +17,20 @@ class MovieCastSection extends ConsumerWidget {
     if (casts.isEmpty) {
       return const SizedBox.shrink();
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(title: "Casts"),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 16),
+        const SectionTitle(title: "Casts"),
+        SizedBox(
           height: 180,
-          child: ListView.builder(
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: casts.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final cast = casts[index];
-              // if (cast.fullProfileUrl == null ||
-              //     cast.fullProfileUrl!.isEmpty) {
-              //   return const SizedBox.shrink(); // Skip empty profiles
-              // }
               return CastCard(cast: cast);
             },
           ),

@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:read_more_text/read_more_text.dart';
 import 'package:trelpix/domain/entities/movie_details.dart';
@@ -5,6 +7,7 @@ import 'package:trelpix/domain/entities/movie_details.dart';
 class MovieInfoSection extends StatelessWidget {
   const MovieInfoSection({super.key, required this.movieDetails});
   final MovieDetails movieDetails;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -16,13 +19,12 @@ class MovieInfoSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Tooltip(
-                    message: movieDetails.title,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Tooltip(
+                      message: movieDetails.title,
                       child: Text(
                         movieDetails.title,
                         maxLines: 2,
@@ -34,37 +36,42 @@ class MovieInfoSection extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-
-                  SizedBox(height: 10),
-                  Text(
-                    movieDetails.releaseDate.toString(),
-                    style: TextStyle(
-                      color: Colors.white38,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 10),
+                    Text(
+                      movieDetails.releaseDate ?? 'N/A',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               Row(
                 children: [
                   Text(
-                    movieDetails.voteAverage!.toStringAsFixed(1),
-                    style: TextStyle(
+                    movieDetails.voteAverage?.toStringAsFixed(1) ?? '0.0',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Icon(Icons.star, size: 15, color: Colors.yellow),
+                  const SizedBox(width: 6),
+                  Icon(
+                    Platform.isIOS ? CupertinoIcons.star_fill : Icons.star,
+                    size: 16,
+                    color: Colors.yellow,
+                  ),
                 ],
               ),
             ],
           ),
-          SizedBox(height: 10),
+
+          const SizedBox(height: 10),
+
           if (movieDetails.genres.isNotEmpty) ...[
             Wrap(
               spacing: 8.0,
@@ -73,10 +80,13 @@ class MovieInfoSection extends StatelessWidget {
                   movieDetails.genres
                       .map(
                         (genre) => Chip(
-                          label: Text(genre.name),
+                          label: Text(
+                            genre.name,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                           backgroundColor: Colors.white24,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                       )
@@ -85,20 +95,22 @@ class MovieInfoSection extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: ReadMoreText(
-              movieDetails.overview!,
-              numLines: 3,
-              readLessText: "Read less",
-              readMoreText: "Read More",
-              style: TextStyle(
-                color: Colors.white70,
-                height: 1.5,
-                fontWeight: FontWeight.w500,
+          // Overview
+          if (movieDetails.overview?.isNotEmpty ?? false)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: ReadMoreText(
+                movieDetails.overview!,
+                numLines: 3,
+                readLessText: "Read less",
+                readMoreText: "Read more",
+                style: const TextStyle(
+                  color: Colors.white70,
+                  height: 1.5,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

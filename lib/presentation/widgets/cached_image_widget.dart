@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/providers/usecase_providers.dart';
@@ -42,13 +43,7 @@ class _CachedImageViewState extends ConsumerState<CachedImageView> {
   @override
   Widget build(BuildContext context) {
     if (widget.imageUrl.isEmpty) {
-      return SizedBox(
-        height: widget.height,
-        width: widget.width,
-        child:
-            widget.errorWidget ??
-            const Center(child: Icon(Icons.broken_image, size: 48)),
-      );
+      return _buildErrorWidget();
     }
 
     return FutureBuilder<File?>(
@@ -69,12 +64,11 @@ class _CachedImageViewState extends ConsumerState<CachedImageView> {
             return _buildNetworkImage();
           }
         }
+
         return SizedBox(
           height: widget.height,
           width: widget.width,
-          child:
-              widget.placeholder ??
-              const Center(child: CircularProgressIndicator()),
+          child: widget.placeholder ?? _defaultLoadingIndicator(),
         );
       },
     );
@@ -92,38 +86,39 @@ class _CachedImageViewState extends ConsumerState<CachedImageView> {
           height: widget.height,
           width: widget.width,
           child: Center(
-            child: CircularProgressIndicator(
-              value:
-                  loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-            ),
+            child:
+                Platform.isIOS
+                    ? const CupertinoActivityIndicator()
+                    : CircularProgressIndicator(
+                      value:
+                          loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                    ),
           ),
         );
       },
-      errorBuilder: (context, error, stackTrace) {
-        return SizedBox(
-          height: widget.height,
-          width: widget.width,
-          child:
-              widget.errorWidget ??
-              const Center(child: Icon(Icons.broken_image, size: 48)),
-        );
-      },
+      errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
     );
   }
-}
 
-class UseCaseProviders {
-  final Provider<dynamic> getImageFileUseCaseProvider;
+  Widget _buildErrorWidget() {
+    return SizedBox(
+      height: widget.height,
+      width: widget.width,
+      child:
+          widget.errorWidget ??
+          const Center(child: Icon(Icons.broken_image, size: 48)),
+    );
+  }
 
-  UseCaseProviders._(this.getImageFileUseCaseProvider);
-
-  static final getImageFile = Provider(
-    (ref) =>
-        throw UnimplementedError(
-          'getImageFileUseCaseProvider is not yet implemented in UseCaseProviders class.',
-        ),
-  );
+  Widget _defaultLoadingIndicator() {
+    return Center(
+      child:
+          Platform.isIOS
+              ? const CupertinoActivityIndicator()
+              : const CircularProgressIndicator(),
+    );
+  }
 }

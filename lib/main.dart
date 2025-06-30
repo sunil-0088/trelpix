@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -11,7 +12,6 @@ import 'package:trelpix/data/models/movie_model.dart';
 import 'package:trelpix/data/models/review_model.dart';
 import 'package:trelpix/data/models/reviews_response_model.dart';
 import 'package:trelpix/presentation/pages/main_page.dart';
-import 'package:device_preview/device_preview.dart';
 
 const String tmdbApiKey = '050941db6fd813e38d32e88db00f4bdd';
 
@@ -29,67 +29,77 @@ Future<void> main() async {
   Hive.registerAdapter(CreditsResponseModelAdapter());
   Hive.registerAdapter(ReviewsResponseModelAdapter());
 
-  runApp(
-    ProviderScope(
-      child: DevicePreview(
-        enabled: !kReleaseMode,
-        builder: (context) => MovieApp(),
-      ),
-    ),
-  );
+  runApp(ProviderScope(child: const MovieApp()));
 }
 
-class MovieApp extends StatefulWidget {
+class MovieApp extends StatelessWidget {
   const MovieApp({super.key});
 
   @override
-  State<MovieApp> createState() => _MovieAppState();
-}
-
-class _MovieAppState extends State<MovieApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Movie DB App',
-      debugShowCheckedModeBanner: false,
-      builder: DevicePreview.appBuilder,
-      locale: DevicePreview.locale(context),
-      themeMode: ThemeMode.dark,
-      darkTheme: ThemeData(
+    final isIOS = Platform.isIOS;
+
+    final themeData = ThemeData(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color.fromRGBO(18, 16, 18, 1),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.deepPurple,
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Color.fromRGBO(18, 16, 18, 1),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
-          bodyMedium: TextStyle(fontSize: 14, color: Colors.white60),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white10,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.deepPurple,
+        bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
+        bodyMedium: TextStyle(fontSize: 14, color: Colors.white60),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white10,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
-
-      home: MainPage(),
+      iconTheme: const IconThemeData(color: Colors.white),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Colors.deepPurple,
+      ),
     );
+
+    if (isIOS) {
+      return CupertinoApp(
+        title: 'Movie DB App',
+        debugShowCheckedModeBanner: false,
+        theme: const CupertinoThemeData(
+          brightness: Brightness.dark,
+          primaryColor: CupertinoColors.activeBlue,
+          scaffoldBackgroundColor: CupertinoColors.black,
+          textTheme: CupertinoTextThemeData(
+            navLargeTitleTextStyle: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: CupertinoColors.white,
+            ),
+            textStyle: TextStyle(color: CupertinoColors.systemGrey),
+          ),
+        ),
+        home: const MainPage(),
+      );
+    } else {
+      return MaterialApp(
+        title: 'Movie DB App',
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.dark,
+        darkTheme: themeData,
+        home: const MainPage(),
+      );
+    }
   }
 }

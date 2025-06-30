@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trelpix/presentation/pages/search_page.dart';
@@ -14,7 +17,6 @@ class MyDrawer extends StatelessWidget {
         children: [
           Container(
             height: 120,
-            width: double.infinity,
             padding: const EdgeInsets.all(16.0),
             color: Theme.of(context).colorScheme.onPrimary,
             alignment: Alignment.bottomLeft,
@@ -24,21 +26,30 @@ class MyDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home),
+            leading: Icon(
+              Platform.isIOS ? CupertinoIcons.home : Icons.home,
+              color: Theme.of(context).iconTheme.color,
+            ),
             title: const Text('Home'),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.bookmark),
+            leading: Icon(
+              Platform.isIOS ? CupertinoIcons.bookmark : Icons.bookmark,
+              color: Theme.of(context).iconTheme.color,
+            ),
             title: const Text('Bookmark'),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.search),
+            leading: Icon(
+              Platform.isIOS ? CupertinoIcons.search : Icons.search,
+              color: Theme.of(context).iconTheme.color,
+            ),
             title: const Text('Search'),
             onTap: () {
               Navigator.pop(context);

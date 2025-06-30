@@ -1,13 +1,19 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 
 class MovieCard extends StatelessWidget {
   const MovieCard({super.key, required this.movie, required this.onTap});
+
   final Movie movie;
   final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
+    final placeholderIcon = Platform.isIOS ? CupertinoIcons.film : Icons.movie;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -16,57 +22,51 @@ class MovieCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Container(
-                  height: 170,
-                  width: 150,
-                  foregroundDecoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.black45, Colors.transparent],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                    ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
+                  child: Container(
+                    height: 170,
+                    width: 150,
+                    foregroundDecoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.black45, Colors.transparent],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
                     ),
-                  ),
-
-                  child:
-                      movie.fullPosterUrl == null ||
-                              movie.fullPosterUrl!.isEmpty
-                          ? const Center(
-                            child: Icon(
-                              Icons.movie,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                          )
-                          : ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(16),
-                              topRight: Radius.circular(16),
-                            ),
-                            child: CachedImageView(
+                    color: Colors.grey.shade900,
+                    child:
+                        movie.fullPosterUrl == null ||
+                                movie.fullPosterUrl!.isEmpty
+                            ? Center(
+                              child: Icon(
+                                placeholderIcon,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                            )
+                            : CachedImageView(
                               imageUrl: movie.fullPosterUrl!,
                               fit: BoxFit.cover,
                               placeholder: const Center(
                                 child: CircularProgressIndicator(),
                               ),
                             ),
-                          ),
+                  ),
                 ),
                 Positioned(
-                  right: 1,
-                  bottom: 1,
+                  right: 6,
+                  bottom: 6,
                   child: Row(
                     children: [
                       Text(
-                        movie.voteAverage!.toStringAsFixed(1),
+                        movie.voteAverage?.toStringAsFixed(1) ?? 'N/A',
                         maxLines: 1,
                         overflow: TextOverflow.clip,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -81,25 +81,28 @@ class MovieCard extends StatelessWidget {
             ),
             Container(
               width: 150,
-              padding: EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     movie.title,
                     maxLines: 1,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 5),
-                  if (movie.releaseDate != null)
-                    Text(
-                      "2023",
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                      ),
+                  Text(
+                    movie.releaseDate?.split('-').first ?? 'Unknown',
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
                     ),
+                  ),
                   const SizedBox(height: 5),
                 ],
               ),

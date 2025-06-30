@@ -19,7 +19,7 @@ class TopRatedCarousel extends ConsumerWidget {
     final topRatedMoviesAsync = ref.watch(topRatedMoviesProvider);
 
     return topRatedMoviesAsync.when(
-      data: (movies) => _buildCarousel(movies, screenHeight, ref),
+      data: (movies) => _buildCarousel(context, movies),
       loading: () => ShimmerCarouselPlaceholder(height: screenHeight * 0.6),
       error: (err, stack) {
         if (err is DeferredLoadException) {
@@ -29,11 +29,11 @@ class TopRatedCarousel extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Error loading movies: $err',
+                'Error loading top rated movies.\n$err',
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium!.copyWith(color: Colors.redAccent),
+                ).textTheme.bodyMedium?.copyWith(color: Colors.redAccent),
               ),
             ),
           );
@@ -42,25 +42,19 @@ class TopRatedCarousel extends ConsumerWidget {
     );
   }
 
-  Widget _buildCarousel(
-    List<Movie> movies,
-    double screenHeight,
-    WidgetRef ref,
-  ) {
-    final CarouselSliderController controller = CarouselSliderController();
+  Widget _buildCarousel(BuildContext context, List<Movie> movies) {
     return SizedBox(
       height: screenHeight * 0.6,
       child: CarouselSlider.builder(
-        carouselController: controller,
-        itemCount: 5,
+        itemCount: movies.length.clamp(0, 5),
         itemBuilder: (context, index, _) {
           final movie = movies[index];
+
           return Stack(
             fit: StackFit.expand,
             children: [
               Container(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                foregroundDecoration: BoxDecoration(
+                foregroundDecoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.black45, Colors.transparent],
                     begin: Alignment.bottomCenter,
@@ -77,7 +71,7 @@ class TopRatedCarousel extends ConsumerWidget {
                           ),
                         )
                         : CachedImageView(
-                          imageUrl: movie.fullPosterUrl ?? '',
+                          imageUrl: movie.fullPosterUrl!,
                           fit: BoxFit.fill,
                           placeholder: const Center(
                             child: CircularProgressIndicator(),
@@ -93,8 +87,7 @@ class TopRatedCarousel extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) => MovieDetailPage(movieId: movie.id),
+                        builder: (_) => MovieDetailPage(movieId: movie.id),
                       ),
                     );
                   },
@@ -105,15 +98,14 @@ class TopRatedCarousel extends ConsumerWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: .2),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.play_arrow, color: Colors.white),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
                             "Details",
                             style: TextStyle(color: Colors.white, fontSize: 16),
@@ -131,9 +123,7 @@ class TopRatedCarousel extends ConsumerWidget {
           autoPlay: true,
           height: screenHeight * 0.6,
           enlargeCenterPage: true,
-          viewportFraction: 1,
-          onPageChanged: (index, reason) {},
-          // aspectRatio: 16 / 9,
+          viewportFraction: 1.0,
         ),
       ),
     );

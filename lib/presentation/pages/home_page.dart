@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
@@ -16,8 +18,12 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenHeight = MediaQuery.of(context).size.height;
+
     return SingleChildScrollView(
-      // physics: const BouncingScrollPhysics(),
+      physics:
+          Platform.isIOS
+              ? const BouncingScrollPhysics()
+              : const ClampingScrollPhysics(),
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
@@ -35,9 +41,14 @@ class HomePage extends ConsumerWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Scaffold.of(context).openDrawer();
+                          Scaffold.maybeOf(context)?.openDrawer();
                         },
-                        child: Icon(Icons.menu, color: Colors.white70),
+                        child: Icon(
+                          Platform.isIOS
+                              ? CupertinoIcons.line_horizontal_3
+                              : Icons.menu,
+                          color: Colors.white70,
+                        ),
                       ),
                       CircleAvatar(
                         radius: 20,
@@ -58,17 +69,21 @@ class HomePage extends ConsumerWidget {
             ],
           ),
 
-          SectionTitle(title: "Tending Movies"),
-          _buildMovieList(context, ref, true),
+          SectionTitle(title: "Trending Movies"),
+          _buildMovieList(context, ref, isTrending: true),
 
           SectionTitle(title: "Now Playing Movies"),
-          _buildMovieList(context, ref, false),
+          _buildMovieList(context, ref, isTrending: false),
         ],
       ),
     );
   }
 
-  Widget _buildMovieList(BuildContext context, WidgetRef ref, bool isTrending) {
+  Widget _buildMovieList(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool isTrending,
+  }) {
     final moviesAsync =
         isTrending
             ? ref.watch(trendingMoviesProvider)
@@ -88,11 +103,17 @@ class HomePage extends ConsumerWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              MovieDetailPage(movieId: movies[index].id),
-                    ),
+                    Platform.isIOS
+                        ? CupertinoPageRoute(
+                          builder:
+                              (context) =>
+                                  MovieDetailPage(movieId: movies[index].id),
+                        )
+                        : MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  MovieDetailPage(movieId: movies[index].id),
+                        ),
                   );
                 },
               );
@@ -100,10 +121,10 @@ class HomePage extends ConsumerWidget {
           ),
         );
       },
-      loading: () => ShimmerMovieCardList(),
+      loading: () => const ShimmerMovieCardList(),
       error: (err, stack) {
         if (err is DeferredLoadException) {
-          return ShimmerMovieCardList();
+          return const ShimmerMovieCardList();
         } else {
           return Center(
             child: Padding(
