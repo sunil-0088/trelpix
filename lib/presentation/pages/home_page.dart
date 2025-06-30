@@ -59,6 +59,7 @@ class HomePage extends ConsumerWidget {
                             fit: BoxFit.cover,
                             placeholder: Image.asset('assets/person.png'),
                             imageUrl: "https://avatar.iran.liara.run/public",
+                            errorWidget: Image.asset('assets/person.png'),
                           ),
                         ),
                       ),
