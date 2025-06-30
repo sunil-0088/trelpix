@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:logger/logger.dart';
 import 'package:trelpix/data/datasources/local/movie_local_datasource.dart';
 import 'package:trelpix/data/datasources/remote/movie_remote_datasource.dart';
@@ -28,17 +27,16 @@ class MovieRepositoryImpl implements IMovieRepository {
   Future<List<Movie>> getMovies(MovieCategory category) async {
     try {
       final isStale = await local.isCacheStale(category);
-      // if (!isStale) {
-      //   final localMovies = await local.getMovies(category);
-      //   if (localMovies.isNotEmpty) {
-      //     _logger.d('Serving ${category.name} movies from local cache.');
+      if (!isStale) {
+        final localMovies = await local.getMovies(category);
+        if (localMovies.isNotEmpty) {
+          _logger.d('Serving ${category.name} movies from local cache.');
 
-      //     return localMovies.map((model) => model.toEntity()).toList();
-      //   }
-      // }
+          return localMovies.map((model) => model.toEntity()).toList();
+        }
+      }
 
       _logger.d('Fetching ${category.name} movies from remote.');
-      // MovieRemoteDataSource now directly returns List<MovieModel> by parsing MoviesResponseModel
       List<MovieModel> remoteMovies;
       switch (category) {
         case MovieCategory.trending:
@@ -51,19 +49,33 @@ class MovieRepositoryImpl implements IMovieRepository {
           remoteMovies = await remote.getTopRatedMovies();
           break;
       }
-      Future.microtask(() {
-        for (final movie in remoteMovies) {
-          () async {
-            _logger.d('Preloading image and movie Details: ${movie.title}');
-            final details = await getMovieDetails(movie.id);
-            if (details.fullBackdropUrl != null) {
-              await imageCacheService.downloadAndCacheImage(
-                details.fullBackdropUrl!,
-              );
+
+      for (final movie in remoteMovies) {
+        () async {
+          _logger.d('Preloading image and movie Details: ${movie.title}');
+          final details = await getMovieDetails(movie.id);
+          if (details.fullBackdropUrl != null) {
+            await imageCacheService.downloadAndCacheImage(
+              details.fullBackdropUrl!,
+            );
+            for (final review in details.reviews) {
+              if (review.authorDetails != null &&
+                  review.authorDetails!.avatarPath != null) {
+                await imageCacheService.downloadAndCacheImage(
+                  review.authorDetails!.avatarPath!,
+                );
+              }
             }
-          }();
-        }
-      });
+            for (final cast in details.casts) {
+              if (cast.profilePath != null) {
+                await imageCacheService.downloadAndCacheImage(
+                  cast.profilePath!,
+                );
+              }
+            }
+          }
+        }();
+      }
 
       await local.putMovies(category, remoteMovies);
 
@@ -166,16 +178,16 @@ class MovieRepositoryImpl implements IMovieRepository {
     try {
       final localCredits = await local.getMovieCast(movieId);
       if (localCredits != null) {
-        print('Serving movie cast for $movieId from local cache.');
+        _logger.d('Serving movie cast for $movieId from local cache.');
         return localCredits.toCastList();
       }
 
-      print('Fetching movie cast for $movieId from remote.');
+      _logger.d('Fetching movie cast for $movieId from remote.');
       final remoteCredits = await remote.getMovieCredits(movieId);
       await local.putMovieCast(movieId, remoteCredits);
       return remoteCredits.toCastList();
     } catch (e) {
-      print('Error getting movie cast for $movieId: $e');
+      _logger.d('Error getting movie cast for $movieId: $e');
       rethrow;
     }
   }
@@ -185,11 +197,11 @@ class MovieRepositoryImpl implements IMovieRepository {
     try {
       final localReviewsResponse = await local.getMovieReviews(movieId);
       if (localReviewsResponse != null) {
-        print('Serving movie reviews for $movieId from local cache.');
+        _logger.d('Serving movie reviews for $movieId from local cache.');
         return localReviewsResponse.toReviewList(); // Extract results here
       }
 
-      print('Fetching movie reviews for $movieId from remote.');
+      _logger.d('Fetching movie reviews for $movieId from remote.');
       final remoteReviewsResponse = await remote.getMovieReviews(movieId);
       await local.putMovieReviews(
         movieId,
@@ -197,7 +209,7 @@ class MovieRepositoryImpl implements IMovieRepository {
       ); // Store the full response
       return remoteReviewsResponse.toReviewList(); // Extract results here
     } catch (e) {
-      print('Error getting movie reviews for $movieId: $e');
+      _logger.d('Error getting movie reviews for $movieId: $e');
       rethrow;
     }
   }
@@ -208,7 +220,7 @@ class MovieRepositoryImpl implements IMovieRepository {
       final bookmarkedModels = await local.getBookmarkedMovies();
       return bookmarkedModels.map((model) => model.toEntity()).toList();
     } catch (e) {
-      print('Error getting bookmarked movies: $e');
+      _logger.d('Error getting bookmarked movies: $e');
       rethrow;
     }
   }
@@ -218,7 +230,7 @@ class MovieRepositoryImpl implements IMovieRepository {
     try {
       await local.addBookmark(movie.toModel());
     } catch (e) {
-      print('Error adding bookmark for ${movie.id}: $e');
+      _logger.d('Error adding bookmark for ${movie.id}: $e');
       rethrow;
     }
   }
@@ -228,7 +240,7 @@ class MovieRepositoryImpl implements IMovieRepository {
     try {
       await local.removeBookmark(movieId);
     } catch (e) {
-      print('Error removing bookmark for $movieId: $e');
+      _logger.d('Error removing bookmark for $movieId: $e');
       rethrow;
     }
   }
@@ -238,7 +250,7 @@ class MovieRepositoryImpl implements IMovieRepository {
     try {
       return await local.isMovieBookmarked(movieId);
     } catch (e) {
-      print('Error checking bookmark for $movieId: $e');
+      _logger.d('Error checking bookmark for $movieId: $e');
       rethrow;
     }
   }

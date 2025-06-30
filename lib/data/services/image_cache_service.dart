@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImageCacheService {
@@ -27,9 +26,7 @@ class ImageCacheService {
 
   Future<File?> downloadAndCacheImage(String imageUrl) async {
     if (imageUrl.isEmpty) return null;
-    if (kDebugMode) {
-      print('ImageCacheService: Downloading image from $imageUrl');
-    }
+
     final cacheDirPath = await _getCacheDirectoryPath();
     final filePath = _getLocalFilePath(cacheDirPath, imageUrl);
     final file = File(filePath);
@@ -42,9 +39,6 @@ class ImageCacheService {
       await dio.download(imageUrl, filePath);
       return file;
     } catch (e) {
-      if (kDebugMode) {
-        print('ImageCacheService: Download failed for $imageUrl: $e');
-      }
       return null;
     }
   }
@@ -55,15 +49,10 @@ class ImageCacheService {
     final cacheDirPath = await _getCacheDirectoryPath();
     final filePath = _getLocalFilePath(cacheDirPath, imageUrl);
     final file = File(filePath);
-    if (kDebugMode) {
-      print('ImageCacheService: Checking cache for image: $imageUrl');
-    }
+
     if (await file.exists()) {
       return file;
     } else {
-      if (kDebugMode) {
-        print('ImageCacheService: Image not found in cache: $imageUrl');
-      }
       return null;
     }
   }
@@ -73,7 +62,6 @@ class ImageCacheService {
     final directory = Directory(cacheDirPath);
     if (await directory.exists()) {
       await directory.delete(recursive: true);
-      print('ImageCacheService: Image cache cleared.');
     }
   }
 }

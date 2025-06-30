@@ -1,21 +1,28 @@
-// lib/providers/core_providers.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-// Core network/data layer imports
 import 'package:trelpix/core/network/tmdb_api_client.dart';
 import 'package:trelpix/data/models/credits_response_model.dart';
 import 'package:trelpix/data/models/movie_details_model.dart';
 import 'package:trelpix/data/models/movie_model.dart';
 import 'package:trelpix/data/models/reviews_response_model.dart';
+import 'package:trelpix/data/services/background_service.dart';
 import 'package:trelpix/data/services/image_cache_service.dart';
+import 'package:trelpix/providers/datasource_providers.dart';
 
-/* ===========================================================================
-   Level 1: Core Dependencies (Dio, Hive, API Client, ImageCacheService)
-   =========================================================================== */
-
-final dioProvider = Provider<Dio>((ref) => Dio());
+final dioProvider = Provider<Dio>(
+  (ref) => Dio(
+    BaseOptions(
+      baseUrl: 'https://api.themoviedb.org/3/',
+      headers: {
+        'Authorization':
+            'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNTA5NDFkYjZmZDgxM2UzOGQzMmU4OGRiMDBmNGJkZCIsIm5iZiI6MTc1MTAxODU3OC4zNjQsInN1YiI6IjY4NWU2YzUyMjBhMTk4YzExZDE1NWIxZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BjBbp8BNpHhCjz0wCjSJYMycqUtk5PfomuwORXZQIpA',
+        'Accept': 'application/json',
+      },
+    ),
+  ),
+);
 
 final tmdbApiClientProvider = Provider<TmdbApiClient>((ref) {
   final dio = ref.watch(dioProvider);
@@ -39,4 +46,27 @@ final hiveBoxesProvider = FutureProvider<Map<String, Box>>((ref) async {
 final imageCacheServiceProvider = Provider<ImageCacheService>((ref) {
   final dio = ref.watch(dioProvider);
   return ImageCacheService(dio);
+});
+
+final backgroundServiceProvider = Provider<AsyncValue<BackgroundService>>((
+  ref,
+) {
+  final imageCacheService = ref.watch(imageCacheServiceProvider);
+  final movieRemoteDataSource = ref.watch(movieRemoteDataSourceProvider);
+  final movieLocalDataSourceAsync = ref.watch(movieLocalDataSourceProvider);
+
+  return movieLocalDataSourceAsync.when(
+    data: (localDataSource) {
+      return AsyncValue.data(
+        BackgroundService(
+          local: localDataSource,
+          remote: movieRemoteDataSource,
+          imageCacheService: imageCacheService,
+        ),
+      );
+    },
+
+    loading: () => const AsyncValue.loading(),
+    error: (err, st) => AsyncValue.error(err, st),
+  );
 });

@@ -26,7 +26,6 @@ class MovieCard extends StatelessWidget {
                       end: Alignment.topCenter,
                     ),
                   ),
-                  // margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
@@ -78,19 +77,6 @@ class MovieCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Positioned(
-
-                //   child: Row(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Expanded(
-                //         child:
-                //       ),
-                //       const SizedBox(width: 20),
-
-                //     ],
-                //   ),
-                // ),
               ],
             ),
             Container(

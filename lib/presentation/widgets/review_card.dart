@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trelpix/domain/entities/review.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 
 class ReviewCard extends StatelessWidget {
   const ReviewCard({super.key, required this.review});
@@ -25,9 +26,16 @@ class ReviewCard extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(
-                        review.authorDetails?.fullAvatarUrl ??
-                            'https://avatar.iran.liara.run/public',
+                      child: ClipOval(
+                        child: CachedImageView(
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          placeholder: Image.asset('assets/person.png'),
+                          imageUrl:
+                              review.authorDetails?.fullAvatarUrl ??
+                              "https://avatar.iran.liara.run/public",
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),

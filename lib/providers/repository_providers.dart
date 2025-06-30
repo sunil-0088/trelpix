@@ -1,31 +1,21 @@
-// lib/providers/repository_providers.dart
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Data layer imports
 import 'package:trelpix/data/repositories/movie_repository_impl.dart';
 import 'package:trelpix/data/repositories/image_repository_impl.dart';
 
-// Domain layer imports (interfaces)
 import 'package:trelpix/domain/repositories/movie_repository.dart';
-import 'package:trelpix/domain/repositories/cached_image_repositoy.dart'; // Note: typo 'repositoy' -> 'repository'
+import 'package:trelpix/domain/repositories/cached_image_repositoy.dart';
 
-// Import data source and core providers for dependencies
 import 'package:trelpix/providers/core_providers.dart';
 import 'package:trelpix/providers/datasource_providers.dart';
 
-/* ===========================================================================
-   Level 3: Repository Implementations (as Interfaces)
-   =========================================================================== */
-
-// movieRepositoryProvider now directly injects the concrete data source implementations
 final movieRepositoryProvider = Provider<IMovieRepository>((ref) {
   final remoteDataSource = ref.watch(movieRemoteDataSourceProvider);
   final localDataSourceAsync = ref.watch(movieLocalDataSourceProvider);
   final imageCacheService = ref.watch(imageCacheServiceProvider);
 
-  // Still use .when for localDataSourceAsync as it's a FutureProvider
   return localDataSourceAsync.when(
     data:
         (localDataSource) => MovieRepositoryImpl(

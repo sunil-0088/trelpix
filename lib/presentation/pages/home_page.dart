@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
-import 'package:trelpix/presentation/pages/search_page.dart';
+import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 import 'package:trelpix/presentation/widgets/movie_card.dart';
 import 'package:trelpix/presentation/widgets/section_title.dart';
 import 'package:trelpix/presentation/widgets/shimmer/shimmer_movie_card_list.dart';
@@ -19,77 +17,10 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenHeight = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+      // physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       RichText(
-          //         text: TextSpan(
-          //           text: 'Hi, ',
-          //           style: const TextStyle(
-          //             color: Colors.white,
-          //             fontSize: 34,
-          //             fontWeight: FontWeight.bold,
-          //           ),
-          //           children: [
-          //             TextSpan(
-          //               text: 'Inshorts!',
-          //               style: TextStyle(
-          //                 color: Theme.of(context).colorScheme.primary,
-          //                 fontSize: 34,
-          //                 fontWeight: FontWeight.bold,
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //       CircleAvatar(
-          //         backgroundImage: NetworkImage(
-          //           "https://avatar.iran.liara.run/public",
-          //         ),
-          //         radius: 20,
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // const SizedBox(height: 20),
-
-          // GestureDetector(
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => SearchPage()),
-          //     );
-          //   },
-          //   child: Padding(
-          //     padding: EdgeInsets.symmetric(horizontal: 20),
-          //     child: Container(
-          //       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          //       decoration: BoxDecoration(
-          //         borderRadius: BorderRadius.circular(20),
-          //         color: Theme.of(
-          //           context,
-          //         ).colorScheme.primary.withValues(alpha: 0.3),
-          //       ),
-          //       child: Row(
-          //         children: [
-          //           Icon(Icons.search, color: Colors.white30),
-          //           const SizedBox(width: 20),
-          //           Text(
-          //             "Search",
-          //             style: TextStyle(fontSize: 18, color: Colors.white30),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 20),
           Stack(
             children: [
               TopRatedCarousel(screenHeight: screenHeight),
@@ -102,12 +33,23 @@ class HomePage extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.menu, color: Colors.white70),
+                      GestureDetector(
+                        onTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        child: Icon(Icons.menu, color: Colors.white70),
+                      ),
                       CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          "https://avatar.iran.liara.run/public",
-                        ),
                         radius: 20,
+                        child: ClipOval(
+                          child: CachedImageView(
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            placeholder: Image.asset('assets/person.png'),
+                            imageUrl: "https://avatar.iran.liara.run/public",
+                          ),
+                        ),
                       ),
                     ],
                   ),

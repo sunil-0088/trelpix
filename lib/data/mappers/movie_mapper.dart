@@ -35,7 +35,6 @@ extension AuthorDetailsEntityToModel on AuthorDetails {
   }
 }
 
-// --- Cast Mapping ---
 extension CastModelToEntity on CastModel {
   Cast toEntity() {
     return Cast(
@@ -58,7 +57,6 @@ extension CastEntityToModel on Cast {
   }
 }
 
-// --- Genre Mapping ---
 extension GenreModelToEntity on GenreModel {
   Genre toEntity() {
     return Genre(id: id, name: name);
@@ -71,7 +69,6 @@ extension GenreEntityToModel on Genre {
   }
 }
 
-// --- Movie Mapping ---
 extension MovieModelToEntity on MovieModel {
   Movie toEntity() {
     return Movie(
@@ -100,7 +97,6 @@ extension MovieEntityToModel on Movie {
   }
 }
 
-// --- Review Mapping ---
 extension ReviewModelToEntity on ReviewModel {
   Review toEntity() {
     return Review(
@@ -127,10 +123,6 @@ extension ReviewEntityToModel on Review {
   }
 }
 
-// --- MovieDetails Mapping ---
-// Note: MovieDetails entity extends Movie.
-// MovieDetailsModel should mirror the structure of MovieDetails entity.
-// It will contain lists of GenreModel, CastModel, ReviewModel.
 extension MovieDetailsModelToEntity on MovieDetailsModel {
   MovieDetails toEntity({List<Cast>? casts, List<Review>? reviews}) {
     return MovieDetails(
@@ -166,7 +158,6 @@ extension MovieDetailsEntityToModel on MovieDetails {
   }
 }
 
-// --- Response Models to Entity Lists ---
 extension CreditsResponseModelToCastList on CreditsResponseModel {
   List<Cast> toCastList() {
     return cast.map((castModel) => castModel.toEntity()).toList();

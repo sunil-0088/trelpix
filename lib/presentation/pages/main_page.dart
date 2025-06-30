@@ -1,10 +1,9 @@
-// lib/presentation/pages/main_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trelpix/presentation/pages/home_page.dart';
 import 'package:trelpix/presentation/pages/saved_movies_page.dart';
 import 'package:trelpix/presentation/pages/search_page.dart';
+import 'package:trelpix/presentation/widgets/my_drawer.dart';
 import 'package:trelpix/providers/navigation_provider.dart';
 
 class MainPage extends ConsumerWidget {
@@ -16,6 +15,7 @@ class MainPage extends ConsumerWidget {
     final pages = [const HomePage(), const SavedMoviesPage()];
 
     return Scaffold(
+      drawer: MyDrawer(),
       body: pages[currentIndex],
 
       bottomNavigationBar: BottomNavigationBar(

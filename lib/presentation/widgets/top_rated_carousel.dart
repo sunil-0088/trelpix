@@ -7,7 +7,6 @@ import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/presentation/pages/movie_detail_page.dart';
 import 'package:trelpix/presentation/widgets/cached_image_widget.dart';
 import 'package:trelpix/presentation/widgets/shimmer/shimmer_carousel_placeholder.dart';
-import 'package:trelpix/providers/navigation_provider.dart';
 import 'package:trelpix/providers/ui_providers.dart';
 
 class TopRatedCarousel extends ConsumerWidget {
@@ -133,9 +132,7 @@ class TopRatedCarousel extends ConsumerWidget {
           height: screenHeight * 0.6,
           enlargeCenterPage: true,
           viewportFraction: 1,
-          onPageChanged: (index, reason) {
-            ref.read(CarouselIndexProvider.notifier).state = index;
-          },
+          onPageChanged: (index, reason) {},
           // aspectRatio: 16 / 9,
         ),
       ),

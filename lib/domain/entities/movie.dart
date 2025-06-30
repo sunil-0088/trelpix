@@ -19,7 +19,6 @@ class Movie extends Equatable {
     this.overview,
   });
 
-  // Helper method to get full image URL
   String? get fullPosterUrl =>
       posterPath != null ? 'https://image.tmdb.org/t/p/w500$posterPath' : null;
   String? get fullBackdropUrl =>
@@ -27,9 +26,6 @@ class Movie extends Equatable {
           ? 'https://image.tmdb.org/t/p/w500$backdropPath'
           : null;
 
-  // Added toJson for consistency, though MovieModel handles the actual serialization
-  // for network/Hive. This is primarily for debugging or if a generic Movie needs to be
-  // converted to JSON outside of a MovieModel context.
   Map<String, dynamic> toJson() {
     return {
       'id': id,

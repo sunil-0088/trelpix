@@ -45,10 +45,10 @@ class SavedMoviesPage extends ConsumerWidget {
           return GridView.builder(
             padding: const EdgeInsets.all(16.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two columns
+              crossAxisCount: 2,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 0.7, // Adjust as needed for card aspect ratio
+              childAspectRatio: 0.7,
             ),
             itemCount: movies.length,
             itemBuilder: (context, index) {

@@ -22,7 +22,7 @@ class BookmarkButton extends ConsumerWidget {
           style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(8),
-            backgroundColor: Colors.white30, // Button background color
+            backgroundColor: Colors.white30,
           ),
 
           onPressed: () {
@@ -31,7 +31,6 @@ class BookmarkButton extends ConsumerWidget {
             } else {
               bookmarkedNotifier.addBookmark(movieDetails);
             }
-            // Optional: Show a snackbar message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

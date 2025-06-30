@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 part 'author_details_model.g.dart';
 
-@HiveType(typeId: 7) // Unique typeId for AuthorDetailsModel
+@HiveType(typeId: 7)
 @JsonSerializable(fieldRename: FieldRename.snake)
 class AuthorDetailsModel extends Equatable {
   @HiveField(0)

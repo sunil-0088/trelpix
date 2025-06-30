@@ -25,7 +25,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      // Call search only after the user stops typing for 500ms
       ref.read(searchMoviesProvider.notifier).search(_searchController.text);
     });
   }
@@ -85,7 +84,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Error searching movies: $err',
+                  'Error searching movies',
                   textAlign: TextAlign.center,
                   style: Theme.of(
                     context,
@@ -115,10 +114,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return GridView.builder(
             padding: const EdgeInsets.all(16.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two columns
+              crossAxisCount: 2,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 0.7, // Adjust as needed for card aspect ratio
+              childAspectRatio: 0.7,
             ),
             itemCount: movies.length,
             itemBuilder: (context, index) {

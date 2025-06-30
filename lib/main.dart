@@ -33,7 +33,7 @@ Future<void> main() async {
     ProviderScope(
       child: DevicePreview(
         enabled: !kReleaseMode,
-        builder: (context) => MovieApp(), // Wrap your app
+        builder: (context) => MovieApp(),
       ),
     ),
   );
@@ -52,8 +52,8 @@ class _MovieAppState extends State<MovieApp> {
     return MaterialApp(
       title: 'Movie DB App',
       debugShowCheckedModeBanner: false,
-      builder: DevicePreview.appBuilder, // Integrates with device_preview
-      locale: DevicePreview.locale(context), // <== Important!
+      builder: DevicePreview.appBuilder,
+      locale: DevicePreview.locale(context),
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
@@ -87,7 +87,6 @@ class _MovieAppState extends State<MovieApp> {
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.deepPurple,
         ),
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
 
       home: MainPage(),

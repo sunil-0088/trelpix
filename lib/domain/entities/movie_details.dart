@@ -5,8 +5,8 @@ import 'package:trelpix/domain/entities/review.dart';
 
 class MovieDetails extends Movie {
   final List<Genre> genres;
-  final List<Cast> casts; // New field
-  final List<Review> reviews; // New field
+  final List<Cast> casts;
+  final List<Review> reviews;
 
   const MovieDetails({
     required super.id,
@@ -16,9 +16,9 @@ class MovieDetails extends Movie {
     super.releaseDate,
     super.voteAverage,
     super.overview,
-    this.genres = const [], // Default to empty list
-    this.casts = const [], // Default to empty list
-    this.reviews = const [], // Default to empty list
+    this.genres = const [],
+    this.casts = const [],
+    this.reviews = const [],
   });
   MovieDetails copyWith({
     int? id,
@@ -49,10 +49,5 @@ class MovieDetails extends Movie {
   }
 
   @override
-  List<Object?> get props => [
-    ...super.props,
-    genres,
-    casts, // Include in props
-    reviews, // Include in props
-  ];
+  List<Object?> get props => [...super.props, genres, casts, reviews];
 }

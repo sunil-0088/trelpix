@@ -7,7 +7,7 @@ import 'package:trelpix/data/models/movie_model.dart';
 import 'package:trelpix/data/models/reviews_response_model.dart';
 import 'package:trelpix/domain/enums/movie_category.dart';
 
-const int CACHE_DURATION_HOURS = 2;
+final int cacheDurationHours = 2;
 
 class MovieLocalDataSource {
   final Box<MovieModel> trendingBox;
@@ -30,7 +30,6 @@ class MovieLocalDataSource {
     required this.cacheTimestampsBox,
   });
 
-  // --- Movie List Caching ---
   Future<List<MovieModel>> getMovies(MovieCategory category) async {
     Box<MovieModel> box;
     switch (category) {
@@ -63,27 +62,26 @@ class MovieLocalDataSource {
         box = topRatedBox;
         break;
     }
-    await box.clear(); // Clear existing data
+    await box.clear();
     await box.addAll(movies);
-    await setCacheTimestamp(category.toString()); // Update timestamp
+    await setCacheTimestamp(category.toString());
   }
 
   Future<bool> isCacheStale(MovieCategory category) async {
     final key = category.toString();
     final timestamp = cacheTimestampsBox.get(key);
     if (timestamp == null) {
-      return true; // No timestamp, so cache is stale
+      return true;
     }
     final lastCached = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final now = DateTime.now();
-    return now.difference(lastCached).inHours >= CACHE_DURATION_HOURS;
+    return now.difference(lastCached).inHours >= 0;
   }
 
   Future<void> setCacheTimestamp(String key) async {
     await cacheTimestampsBox.put(key, DateTime.now().millisecondsSinceEpoch);
   }
 
-  // --- Movie Details Caching ---
   Future<MovieDetailsModel?> getMovieDetails(int movieId) async {
     return detailsBox.get(movieId);
   }
@@ -92,7 +90,6 @@ class MovieLocalDataSource {
     await detailsBox.put(details.id, details);
   }
 
-  // --- Movie Cast Caching ---
   Future<CreditsResponseModel?> getMovieCast(int movieId) async {
     return creditsBox.get(movieId);
   }
@@ -101,7 +98,6 @@ class MovieLocalDataSource {
     await creditsBox.put(movieId, credits);
   }
 
-  // --- Movie Reviews Caching ---
   Future<ReviewsResponseModel?> getMovieReviews(int movieId) async {
     return reviewsBox.get(movieId);
   }
@@ -113,7 +109,6 @@ class MovieLocalDataSource {
     await reviewsBox.put(movieId, reviews);
   }
 
-  // --- Bookmarks ---
   Future<List<MovieModel>> getBookmarkedMovies() async {
     return bookmarkedBox.values.toList();
   }

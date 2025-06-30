@@ -1,7 +1,5 @@
-// lib/providers/ui_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Domain layer imports
 import 'package:trelpix/domain/entities/movie.dart';
 import 'package:trelpix/domain/entities/movie_details.dart';
 import 'package:trelpix/domain/enums/movie_category.dart';
@@ -11,14 +9,7 @@ import 'package:trelpix/domain/usecases/bookmark/get_bookmarked_movies.dart';
 import 'package:trelpix/domain/usecases/bookmark/remove_bookmark.dart';
 import 'package:trelpix/domain/usecases/image/preload_image.dart';
 
-// Import use case providers for dependencies
 import 'package:trelpix/providers/usecase_providers.dart';
-
-/* ===========================================================================
-   Level 5: UI Consumable Providers (uses only Use Cases)
-   =========================================================================== */
-
-// These providers remain exactly the same as they already depend on Use Cases.
 
 final trendingMoviesProvider = FutureProvider<List<Movie>>((ref) async {
   final getMovies = ref.watch(getMoviesUseCaseProvider);
@@ -117,7 +108,6 @@ final isBookmarkedProvider = FutureProvider.family<bool, int>((
   ref,
   movieId,
 ) async {
-  // It should query the use case directly, not watch the full list provider.
   final isMovieBookmarkedUseCase = ref.watch(isMovieBookmarkedUseCaseProvider);
   return await isMovieBookmarkedUseCase(movieId);
 });
@@ -145,7 +135,7 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
   final AddBookmark _addBookmark;
   final RemoveBookmark _removeBookmark;
   final PreloadImage _preloadImage;
-  final Ref _ref; // To invalidate other providers
+  final Ref _ref;
 
   BookmarkedMoviesNotifier(
     this._getBookmarkedMovies,
@@ -154,7 +144,7 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
     this._preloadImage,
     this._ref,
   ) : super(const AsyncValue.loading()) {
-    _loadBookmarks(); // Initial load
+    _loadBookmarks();
   }
 
   Future<void> _loadBookmarks() async {
@@ -173,32 +163,26 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
   }
 
   Future<void> addBookmark(Movie movie) async {
-    // Optimistic UI update (optional, but good for responsiveness)
     if (state.hasValue) {
       final currentList = state.value!;
       if (!currentList.any((m) => m.id == movie.id)) {
         state = AsyncValue.data([...currentList, movie]);
       }
     } else {
-      // If state is not ready, go to loading and reload
       state = const AsyncValue.loading();
     }
 
     try {
-      await _addBookmark(movie); // Execute the use case
-      _ref.invalidate(
-        isBookmarkedProvider(movie.id),
-      ); // Invalidate the single movie status
-      await _loadBookmarks(); // Ensure the full list is accurate
+      await _addBookmark(movie);
+      _ref.invalidate(isBookmarkedProvider(movie.id));
+      await _loadBookmarks();
     } catch (e, st) {
-      // Revert optimistic update or show error
-      state = AsyncValue.error(e, st); // Handle error
-      await _loadBookmarks(); // Attempt to reload to reflect actual state
+      state = AsyncValue.error(e, st);
+      await _loadBookmarks();
     }
   }
 
   Future<void> removeBookmark(int movieId) async {
-    // Optimistic UI update (optional)
     if (state.hasValue) {
       final currentList = state.value!;
       state = AsyncValue.data(
@@ -209,15 +193,12 @@ class BookmarkedMoviesNotifier extends StateNotifier<AsyncValue<List<Movie>>> {
     }
 
     try {
-      await _removeBookmark(movieId); // Execute the use case
-      _ref.invalidate(
-        isBookmarkedProvider(movieId),
-      ); // Invalidate the single movie status
-      await _loadBookmarks(); // Ensure the full list is accurate
+      await _removeBookmark(movieId);
+      _ref.invalidate(isBookmarkedProvider(movieId));
+      await _loadBookmarks();
     } catch (e, st) {
-      // Revert optimistic update or show error
-      state = AsyncValue.error(e, st); // Handle error
-      await _loadBookmarks(); // Attempt to reload to reflect actual state
+      state = AsyncValue.error(e, st);
+      await _loadBookmarks();
     }
   }
 }
