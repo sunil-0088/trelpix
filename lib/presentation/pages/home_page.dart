@@ -131,11 +131,11 @@ class HomePage extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Error loading movies: $err',
+                'Error loading movies.\nPlease check your internet connection and restart the app.',
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium!.copyWith(color: Colors.redAccent),
+                ).textTheme.bodyMedium!.copyWith(color: Colors.yellowAccent),
               ),
             ),
           );
