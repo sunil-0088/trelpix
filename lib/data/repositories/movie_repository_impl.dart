@@ -62,14 +62,14 @@ class MovieRepositoryImpl implements IMovieRepository {
               if (review.authorDetails != null &&
                   review.authorDetails!.avatarPath != null) {
                 await imageCacheService.downloadAndCacheImage(
-                  review.authorDetails!.avatarPath!,
+                  review.authorDetails!.fullAvatarUrl!,
                 );
               }
             }
             for (final cast in details.casts) {
               if (cast.profilePath != null) {
                 await imageCacheService.downloadAndCacheImage(
-                  cast.profilePath!,
+                  cast.fullProfileUrl!,
                 );
               }
             }
